@@ -151,7 +151,6 @@ def get_quotes():
     })
 
     num_quotes = json.loads(r.content)["iTotalRecords"]
-    num_quotes = 1
     print(f'{num_quotes} quotes found!')
 
     # Iterate over all quotes, 250 at once
