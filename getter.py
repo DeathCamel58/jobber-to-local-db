@@ -254,8 +254,64 @@ def get_expenses():
     write_data('expenses', all_expenses)
 
 
+def get_transactions():
+    print("Getting Transactions")
+
+    # NOTE: We have to fire off the time frame option as a separate request
+    r = requests.get("https://secure.getjobber.com/reports/transactions", cookies=cookies, params={
+        'report[range]': 'custom',
+        'report[start_date]': '01/01/2015',
+        'report[end_date]': '01/01/2025'
+    })
+
+    r = requests.get("https://secure.getjobber.com/reports/transactions.json", cookies=cookies, params={
+        'iDisplayStart': 0,
+        'iDisplayLength': 1
+    })
+
+    num_transactions = json.loads(r.content)["iTotalRecords"]
+    print(f'{num_transactions} transactions found!')
+
+    # Iterate over all transactions, 250 at once
+    all_transactions = []
+    for i in track(range(math.ceil(num_transactions / 250)), description="Getting Transaction Data..."):
+        r = requests.get("https://secure.getjobber.com/reports/transactions.json", cookies=cookies, params={
+            'iDisplayStart': (i*250)+1,
+            'iDisplayLength': 250
+        })
+
+        json_data = json.loads(r.content)
+        transactions = json_data['aaData']
+        transactions.pop(-1)
+        for transaction in transactions:
+            # Clean up transaction data
+            url = ""
+
+            if transaction[12] != '':
+                url = transaction[12].split("\"")[5]
+
+            clean = {'Client Name': transaction[0],
+                     'Date': transaction[1],
+                     'Type': transaction[2],
+                     'Total': transaction[3],
+                     'Tip': transaction[4],
+                     'Note': transaction[5],
+                     'Check #': transaction[6],
+                     'Invoice #': transaction[7],
+                     'Method': transaction[8],
+                     'Transaction ID': transaction[9],
+                     'Transaction #': transaction[10],
+                     'Confirmation #': transaction[11],
+                     'Link': url}
+
+            all_transactions.append(clean)
+
+    write_data('transactions', all_transactions)
+
+
 def get_data():
     get_clients()
     get_invoices()
     get_expenses()
     get_quotes()
+    get_transactions()
