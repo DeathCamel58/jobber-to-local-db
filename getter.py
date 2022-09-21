@@ -352,7 +352,7 @@ def get_one_off_jobs():
                      'Client Name': job[1],
                      'Title': job[2],
                      'Scheduled': job[3],
-                     'Completed': job[4],
+                     'Completed': '' if job[4] == '-' else job[4],
                      '#': job[5],
                      'Visits assigned to': job[6],
                      'Total $': job[7],
