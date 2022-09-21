@@ -20,6 +20,8 @@ cookies = {
     'state': '300'
 }
 
+retrieve_at_once = configuration_file.get('jobber', 'retrieve_at_once')
+
 out_location = 'data/'
 
 
@@ -38,12 +40,12 @@ def get_clients():
     num_clients = json.loads(r.content)["iTotalRecords"]
     print(f'{num_clients} invoices found!')
 
-    # Iterate over all clients, 250 at once
+    # Iterate over all clients
     all_clients = []
-    for i in track(range(math.ceil(num_clients/250)), description="Getting Client Data..."):
+    for i in track(range(math.ceil(num_clients/retrieve_at_once)), description="Getting Client Data..."):
         r = requests.get("https://secure.getjobber.com/reports/clients.json", cookies=cookies, params={
-            'iDisplayStart': (i*250)+1,
-            'iDisplayLength': 250
+            'iDisplayStart': (i*retrieve_at_once)+1,
+            'iDisplayLength': retrieve_at_once
         })
 
         json_data = json.loads(r.content)
@@ -85,12 +87,12 @@ def get_invoices():
     num_invoices = json.loads(r.content)["iTotalRecords"]
     print(f'{num_invoices} invoices found!')
 
-    # Iterate over all invoices, 250 at once
+    # Iterate over all invoices
     all_invoices = []
-    for i in track(range(math.ceil(num_invoices/250)), description="Getting Invoice Data..."):
+    for i in track(range(math.ceil(num_invoices/retrieve_at_once)), description="Getting Invoice Data..."):
         r = requests.get("https://secure.getjobber.com/reports/invoices.json", cookies=cookies, params={
-            'iDisplayStart': (i*250)+1,
-            'iDisplayLength': 250
+            'iDisplayStart': (i*retrieve_at_once)+1,
+            'iDisplayLength': retrieve_at_once
         })
 
         json_data = json.loads(r.content)
@@ -156,12 +158,12 @@ def get_quotes():
     num_quotes = json.loads(r.content)["iTotalRecords"]
     print(f'{num_quotes} quotes found!')
 
-    # Iterate over all quotes, 250 at once
+    # Iterate over all quotes
     all_quotes = []
-    for i in track(range(math.ceil(num_quotes / 250)), description="Getting Quote Data..."):
+    for i in track(range(math.ceil(num_quotes / retrieve_at_once)), description="Getting Quote Data..."):
         r = requests.get("https://secure.getjobber.com/reports/quotes.json", cookies=cookies, params={
-            'iDisplayStart': (i*250)+1,
-            'iDisplayLength': 250
+            'iDisplayStart': (i*retrieve_at_once)+1,
+            'iDisplayLength': retrieve_at_once
         })
 
         json_data = json.loads(r.content)
@@ -219,12 +221,12 @@ def get_expenses():
     num_expenses = json.loads(r.content)["iTotalRecords"]
     print(f'{num_expenses} expenses found!')
 
-    # Iterate over all expenses, 250 at once
+    # Iterate over all expenses
     all_expenses = []
-    for i in track(range(math.ceil(num_expenses / 250)), description="Getting Expense Data..."):
+    for i in track(range(math.ceil(num_expenses / retrieve_at_once)), description="Getting Expense Data..."):
         r = requests.get("https://secure.getjobber.com/reports/expenses.json", cookies=cookies, params={
-            'iDisplayStart': (i*250)+1,
-            'iDisplayLength': 250
+            'iDisplayStart': (i*retrieve_at_once)+1,
+            'iDisplayLength': retrieve_at_once
         })
 
         json_data = json.loads(r.content)
@@ -275,12 +277,12 @@ def get_transactions():
     num_transactions = json.loads(r.content)["iTotalRecords"]
     print(f'{num_transactions} transactions found!')
 
-    # Iterate over all transactions, 250 at once
+    # Iterate over all transactions
     all_transactions = []
-    for i in track(range(math.ceil(num_transactions / 250)), description="Getting Transaction Data..."):
+    for i in track(range(math.ceil(num_transactions / retrieve_at_once)), description="Getting Transaction Data..."):
         r = requests.get("https://secure.getjobber.com/reports/transactions.json", cookies=cookies, params={
-            'iDisplayStart': (i*250)+1,
-            'iDisplayLength': 250
+            'iDisplayStart': (i*retrieve_at_once)+1,
+            'iDisplayLength': retrieve_at_once
         })
 
         json_data = json.loads(r.content)
@@ -330,12 +332,12 @@ def get_one_off_jobs():
     num_jobs = json.loads(r.content)["iTotalRecords"]
     print(f'{num_jobs} One-Off jobs found!')
 
-    # Iterate over all One-Off jobs, 250 at once
+    # Iterate over all One-Off jobs
     all_jobs = []
-    for i in track(range(math.ceil(num_jobs / 250)), description="Getting One-Off Job Data..."):
+    for i in track(range(math.ceil(num_jobs / retrieve_at_once)), description="Getting One-Off Job Data..."):
         r = requests.get("https://secure.getjobber.com/reports/one_off_jobs.json", cookies=cookies, params={
-            'iDisplayStart': (i*250)+1,
-            'iDisplayLength': 250
+            'iDisplayStart': (i*retrieve_at_once)+1,
+            'iDisplayLength': retrieve_at_once
         })
 
         json_data = json.loads(r.content)
