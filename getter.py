@@ -98,13 +98,16 @@ def get_invoices():
         invoices.pop(-1)
         for invoice in invoices:
             # Clean up invoice data
-            url = ""
+            joburl = ""
+            jobnum = ""
 
             if invoice[1] != '-':
-                url = "https://secure.getjobber.com" + invoice[1].split("\"")[3]
+                joburl = "https://secure.getjobber.com" + invoice[1].split("\"")[3]
+                jobnum = invoice[1].split(">")[1].split("<")[0][1:]
 
             clean = {'Client Name': invoice[0],
-                     'URL': url,
+                     'Job Link': joburl,
+                     'Job #s': jobnum,
                      'Visits assigned to': invoice[2],
                      'Created': '' if invoice[3] == '-' else invoice[3],
                      'Issued': '' if invoice[4] == '-' else invoice[4],
