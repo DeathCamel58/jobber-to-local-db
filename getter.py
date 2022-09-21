@@ -41,9 +41,8 @@ def get_clients():
     # Iterate over all clients, 250 at once
     all_clients = []
     for i in track(range(math.ceil(num_clients/250)), description="Getting Client Data..."):
-        print(f'Downloading {i*250} to {(i+1)*250}')
         r = requests.get("https://secure.getjobber.com/reports/clients.json", cookies=cookies, params={
-            'iDisplayStart': i*100,
+            'iDisplayStart': (i*250)+1,
             'iDisplayLength': 250
         })
 
@@ -89,9 +88,8 @@ def get_invoices():
     # Iterate over all invoices, 250 at once
     all_invoices = []
     for i in track(range(math.ceil(num_invoices/250)), description="Getting Invoice Data..."):
-        print(f'Downloading {i*250} to {(i+1)*250}')
         r = requests.get("https://secure.getjobber.com/reports/invoices.json", cookies=cookies, params={
-            'iDisplayStart': i*100,
+            'iDisplayStart': (i*250)+1,
             'iDisplayLength': 250
         })
 
@@ -100,12 +98,17 @@ def get_invoices():
         invoices.pop(-1)
         for invoice in invoices:
             # Clean up invoice data
+            url = ""
+
+            if invoice[1] != '-':
+                url = "https://secure.getjobber.com" + invoice[1].split("\"")[3]
+
             clean = {'Client Name': invoice[0],
-                     'URL': f'https://secure.getjobber.com{invoice[1][25:-10]}',
+                     'URL': url,
                      'Visits assigned to': invoice[2],
-                     'Created': invoice[3],
-                     'Issued': invoice[4],
-                     'Due': invoice[5],
+                     'Created': '' if invoice[3] == '-' else invoice[3],
+                     'Issued': '' if invoice[4] == '-' else invoice[4],
+                     'Due': '' if invoice[5] == '-' else invoice[5],
                      'Marked Paid': '' if invoice[6] == '-' else invoice[6],
                      'Invoice #': invoice[7],
                      'Subject': invoice[8],
@@ -123,7 +126,7 @@ def get_invoices():
                      'Billing Zip': invoice[20],
                      'Billing Phone': invoice[21],
                      'Billing Email': invoice[22],
-                     'Viewed in Client Hub': invoice[23],
+                     'Viewed in Client Hub': '' if invoice[23] == '-' else invoice[23],
                      'Technician Name': '' if invoice[24] is None else invoice[24],
                      'Link': invoice[25][61:-10]}
 
@@ -153,9 +156,8 @@ def get_expenses():
     # Iterate over all expenses, 250 at once
     all_expenses = []
     for i in track(range(math.ceil(num_expenses / 250)), description="Getting Expense Data..."):
-        print(f'Downloading {i*250} to {(i+1)*250}')
         r = requests.get("https://secure.getjobber.com/reports/expenses.json", cookies=cookies, params={
-            'iDisplayStart': i*100,
+            'iDisplayStart': (i*250)+1,
             'iDisplayLength': 250
         })
 
@@ -164,16 +166,24 @@ def get_expenses():
         expenses.pop(-1)
         for expense in expenses:
             # Clean up expense data
+            joblink = ""
+            propertylink = ""
+
+            if expense[5] != '':
+                joblink = "https://secure.getjobber.com" + expense[5].split("\"")[3]
+            if expense[6] != '':
+                propertylink = "https://secure.getjobber.com" + expense[6].split("\"")[3]
+
             clean = {'Item Name': expense[0],
                      'Details': expense[1],
                      'Total': expense[2],
                      'Entered By': expense[3],
                      'Reimburse To': expense[4],
-                     'Job Link': f'https://secure.getjobber.com{expense[5][25:-11]}',
-                     'Property Link': f'https://secure.getjobber.com{expense[6][25:45]}',
+                     'Job Link': joblink,
+                     'Property Link': propertylink,
                      'Date': expense[7],
-                     'Client Name': expense[8],
-                     'Job Subject': expense[9],
+                     'Client Name': '' if expense[8] == '' else expense[8],
+                     'Job Subject': '' if expense[9] == '' else expense[9],
                      'Edit Link': expense[10][64:-10]}
 
             all_expenses.append(clean)
