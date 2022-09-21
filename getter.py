@@ -135,6 +135,70 @@ def get_invoices():
     write_data('invoices', all_invoices)
 
 
+def get_quotes():
+    print("Getting Quotes")
+
+    # NOTE: We have to fire off the time frame option as a separate request
+    r = requests.get("https://secure.getjobber.com/reports/quotes", cookies=cookies, params={
+        'report[range]': 'custom',
+        'report[start_date]': '01/01/2015',
+        'report[end_date]': '01/01/2025'
+    })
+
+    r = requests.get("https://secure.getjobber.com/reports/quotes.json", cookies=cookies, params={
+        'iDisplayStart': 0,
+        'iDisplayLength': 1
+    })
+
+    num_quotes = json.loads(r.content)["iTotalRecords"]
+    num_quotes = 1
+    print(f'{num_quotes} quotes found!')
+
+    # Iterate over all quotes, 250 at once
+    all_quotes = []
+    for i in track(range(math.ceil(num_quotes / 250)), description="Getting Quote Data..."):
+        r = requests.get("https://secure.getjobber.com/reports/quotes.json", cookies=cookies, params={
+            'iDisplayStart': (i*250)+1,
+            'iDisplayLength': 250
+        })
+
+        json_data = json.loads(r.content)
+        quotes = json_data['aaData']
+        quotes.pop(-1)
+        for quote in quotes:
+            # Clean up quote data
+            url = ""
+            jobnum = ""
+            joburl = ""
+
+            if quote[14] != '-':
+                url = quote[14].split("\"")[5]
+            if quote[7] != '-':
+                jobnum = quote[7].split(">")[1].split("<")[0][1:]
+                joburl = "https://secure.getjobber.com" + quote[7].split("\"")[3]
+
+            clean = {'Client Name': quote[0],
+                     'Property Address': quote[1],
+                     'Drafted': quote[2],
+                     'Sent': quote[3],
+                     'Changes Requested': quote[4],
+                     'Approved': quote[5],
+                     'Converted': quote[6],
+                     'Job Link': '' if quote[7] == '-' else joburl,
+                     'Job #s': '' if quote[7] == '-' else jobnum,
+                     'Archived': quote[8],
+                     '#': quote[9],
+                     'Viewed in client hub': '' if quote[10] == '-' else quote[10],
+                     'Status': quote[11],
+                     'Total $': quote[12],
+                     'Technician Name': quote[13],
+                     'Link': url}
+
+            all_quotes.append(clean)
+
+    write_data('quotes', all_quotes)
+
+
 def get_expenses():
     print("Getting Expenses")
 
@@ -195,3 +259,4 @@ def get_data():
     get_clients()
     get_invoices()
     get_expenses()
+    get_quotes()
