@@ -309,9 +309,64 @@ def get_transactions():
     write_data('transactions', all_transactions)
 
 
+def get_one_off_jobs():
+    print("Getting One-Off Jobs")
+
+    # NOTE: We have to fire off the time frame option as a separate request
+    r = requests.get("https://secure.getjobber.com/reports/one_off_jobs", cookies=cookies, params={
+        'report[range]': 'custom',
+        'report[start_date]': '01/01/2015',
+        'report[end_date]': '01/01/2025'
+    })
+
+    r = requests.get("https://secure.getjobber.com/reports/one_off_jobs.json", cookies=cookies, params={
+        'iDisplayStart': 0,
+        'iDisplayLength': 1
+    })
+
+    num_jobs = json.loads(r.content)["iTotalRecords"]
+    print(f'{num_jobs} One-Off jobs found!')
+
+    # Iterate over all One-Off jobs, 250 at once
+    all_jobs = []
+    for i in track(range(math.ceil(num_jobs / 250)), description="Getting One-Off Job Data..."):
+        r = requests.get("https://secure.getjobber.com/reports/one_off_jobs.json", cookies=cookies, params={
+            'iDisplayStart': (i*250)+1,
+            'iDisplayLength': 250
+        })
+
+        json_data = json.loads(r.content)
+        jobs = json_data['aaData']
+        jobs.pop(-1)
+        for job in jobs:
+            # Clean up job data
+            url = ""
+
+            if job[11] != '':
+                url = job[11].split("\"")[5]
+
+            clean = {'Created': job[0],
+                     'Client Name': job[1],
+                     'Title': job[2],
+                     'Scheduled': job[3],
+                     'Completed': job[4],
+                     '#': job[5],
+                     'Visits assigned to': job[6],
+                     'Total $': job[7],
+                     'Client Email': job[8],
+                     'Job Site': job[9],
+                     'Technician Name': job[10],
+                     'Link': url}
+
+            all_jobs.append(clean)
+
+    write_data('one-off-jobs', all_jobs)
+
+
 def get_data():
     get_clients()
     get_invoices()
     get_expenses()
     get_quotes()
     get_transactions()
+    get_one_off_jobs()
