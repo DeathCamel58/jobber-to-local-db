@@ -20,7 +20,7 @@ cookies = {
     'state': '300'
 }
 
-retrieve_at_once = configuration_file.get('jobber', 'retrieve_at_once')
+retrieve_at_once = int(configuration_file.get('jobber', 'retrieve_at_once'))
 
 out_location = 'data/'
 
