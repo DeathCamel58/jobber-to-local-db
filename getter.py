@@ -105,7 +105,7 @@ def get_invoices():
 
             if invoice[1] != '-':
                 joburl = "https://secure.getjobber.com" + invoice[1].split("\"")[3]
-                jobnum = invoice[1].split(">")[1].split("<")[0][1:]
+                jobnum = invoice[1].split("#")[1].split("<")[0]
 
             clean = {'Client Name': invoice[0],
                      'Job Link': joburl,
@@ -178,7 +178,7 @@ def get_quotes():
             if quote[14] != '-':
                 url = quote[14].split("\"")[5]
             if quote[7] != '-':
-                jobnum = quote[7].split(">")[1].split("<")[0][1:]
+                jobnum = quote[7].split("#")[1].split("<")[0]
                 joburl = "https://secure.getjobber.com" + quote[7].split("\"")[3]
 
             clean = {'Client Name': quote[0],
