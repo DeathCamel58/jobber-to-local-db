@@ -109,13 +109,13 @@ def get_invoices():
 
             clean = {'Client Name': invoice[0],
                      'Job Link': joburl,
-                     'Job #s': jobnum,
+                     'Job Numbers': jobnum,
                      'Visits assigned to': invoice[2],
                      'Created': '' if invoice[3] == '-' else invoice[3],
                      'Issued': '' if invoice[4] == '-' else invoice[4],
                      'Due': '' if invoice[5] == '-' else invoice[5],
                      'Marked Paid': '' if invoice[6] == '-' else invoice[6],
-                     'Invoice #': invoice[7],
+                     'Invoice Number': invoice[7],
                      'Subject': invoice[8],
                      'Status': invoice[9],
                      'Total': invoice[10],
@@ -189,9 +189,9 @@ def get_quotes():
                      'Approved': quote[5],
                      'Converted': quote[6],
                      'Job Link': '' if quote[7] == '-' else joburl,
-                     'Job #s': '' if quote[7] == '-' else jobnum,
+                     'Job Numbers': '' if quote[7] == '-' else jobnum,
                      'Archived': quote[8],
-                     '#': quote[9],
+                     'Quote Number': quote[9],
                      'Viewed in client hub': '' if quote[10] == '-' else quote[10],
                      'Status': quote[11],
                      'Total $': quote[12],
@@ -235,10 +235,12 @@ def get_expenses():
         for expense in expenses:
             # Clean up expense data
             joblink = ""
+            jobnum = ""
             propertylink = ""
 
             if expense[5] != '':
                 joblink = "https://secure.getjobber.com" + expense[5].split("\"")[3]
+                jobnum = expense[5].split("#")[1].split("<")[0]
             if expense[6] != '':
                 propertylink = "https://secure.getjobber.com" + expense[6].split("\"")[3]
 
@@ -248,6 +250,7 @@ def get_expenses():
                      'Entered By': expense[3],
                      'Reimburse To': expense[4],
                      'Job Link': joblink,
+                     'Job Numbers': jobnum,
                      'Property Link': propertylink,
                      'Date': expense[7],
                      'Client Name': '' if expense[8] == '' else expense[8],
@@ -301,12 +304,12 @@ def get_transactions():
                      'Total': transaction[3],
                      'Tip': transaction[4],
                      'Note': transaction[5],
-                     'Check #': transaction[6],
-                     'Invoice #': transaction[7],
+                     'Check Number': transaction[6],
+                     'Invoice Number': transaction[7],
                      'Method': transaction[8],
                      'Transaction ID': transaction[9],
-                     'Transaction #': transaction[10],
-                     'Confirmation #': transaction[11],
+                     'Transaction Number': transaction[10],
+                     'Confirmation Number': transaction[11],
                      'Link': url}
 
             all_transactions.append(clean)
@@ -355,7 +358,7 @@ def get_one_off_jobs():
                      'Title': job[2],
                      'Scheduled': job[3],
                      'Completed': '' if job[4] == '-' else job[4],
-                     '#': job[5],
+                     'Job Number': job[5],
                      'Visits assigned to': job[6],
                      'Total $': job[7],
                      'Client Email': job[8],
